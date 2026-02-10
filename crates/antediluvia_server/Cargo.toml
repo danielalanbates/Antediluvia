@@ -1,0 +1,22 @@
+[package]
+name = "antediluvia_server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+tokio = { workspace = true }
+sqlx = { workspace = true }
+antediluvia_core = { path = "../antediluvia_core" }
+antediluvia_ai = { path = "../antediluvia_ai" }
+bevy_renet = { workspace = true }
+hex = { workspace = true }
+axum = { workspace = true }
+bincode = { workspace = true }
+rand = { workspace = true }

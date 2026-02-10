@@ -1,0 +1,67 @@
+# Build stage
+FROM rust:1.77-slim-bookworm as builder
+
+WORKDIR /app
+
+# Install dependencies needed for building
+# libssl-dev and pkg-config are common requirements
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy workspace definition
+COPY Cargo.toml Cargo.lock ./
+
+# Copy crate manifests
+COPY crates/antediluvia_core/Cargo.toml crates/antediluvia_core/
+COPY crates/antediluvia_server/Cargo.toml crates/antediluvia_server/
+COPY crates/antediluvia_client/Cargo.toml crates/antediluvia_client/
+COPY crates/antediluvia_ai/Cargo.toml crates/antediluvia_ai/
+
+# Create dummy sources to cache dependencies
+# We only care about building the server, but workspace members might need valid paths
+RUN mkdir -p crates/antediluvia_core/src && echo "fn main() {}" > crates/antediluvia_core/src/lib.rs
+RUN mkdir -p crates/antediluvia_server/src && echo "fn main() {}" > crates/antediluvia_server/src/main.rs
+RUN mkdir -p crates/antediluvia_client/src && echo "fn main() {}" > crates/antediluvia_client/src/main.rs
+RUN mkdir -p crates/antediluvia_ai/src && echo "fn main() {}" > crates/antediluvia_ai/src/lib.rs
+
+# Build dependencies
+RUN cargo build --release --bin antediluvia_server
+
+# Copy actual source code
+COPY crates crates
+
+# Touch main files to force rebuild of our code
+RUN touch crates/antediluvia_server/src/main.rs
+
+# Build the actual application
+RUN cargo build --release --bin antediluvia_server
+
+# Runtime stage
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the binary from builder
+COPY --from=builder /app/target/release/antediluvia_server /app/antediluvia_server
+
+# Expose ports
+# 5000: UDP Game Server
+# 8080: TCP Auth Server
+EXPOSE 5000/udp
+EXPOSE 8080/tcp
+
+# Environment variables
+ENV RUST_LOG=info
+ENV SERVER_ADDR=0.0.0.0
+ENV SERVER_PORT=5000
+
+# Run the server
+CMD ["./antediluvia_server"]
