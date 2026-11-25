@@ -180,7 +180,7 @@ LLM-ready NPC intelligence featuring:
 ### For Development
 ```bash
 # Clone/navigate to project
-cd /Users/daniel/Library/CloudStorage/GoogleDrive-danielalanbates@gmail.com/My\ Drive/AIcode/Antediluvia
+cd $HOME/Library/CloudStorage/GoogleDrive-YOUR_ACCOUNT/My\ Drive/AIcode/Antediluvia
 
 # Build all crates
 cargo build --all

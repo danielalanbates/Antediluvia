@@ -253,7 +253,7 @@ cargo --version
 
 ### Build
 ```bash
-cd /Users/daniel/Library/CloudStorage/GoogleDrive-danielalanbates@gmail.com/My\ Drive/AIcode/Antediluvia/Antediluvia_Dev
+cd $HOME/Library/CloudStorage/GoogleDrive-YOUR_ACCOUNT/My\ Drive/AIcode/Antediluvia/Antediluvia_Dev
 
 # Full build
 cargo build --all --release
